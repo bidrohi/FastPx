@@ -3,8 +3,8 @@ package com.bidyut.app.fastpx;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,8 +43,9 @@ public class PxListActivity extends ActionBarActivity implements Callback<Search
         mPxListView = (RecyclerView) findViewById(R.id.px_list);
         mPxListView.setClickable(true);
         mPxListView.setHasFixedSize(true);
-        mPxListView.setLayoutManager(new GridLayoutManager(this, NUM_COLUMNS,
-                GridLayoutManager.VERTICAL, false));
+//        mPxListView.setLayoutManager(new GridLayoutManager(this, NUM_COLUMNS,
+//                GridLayoutManager.VERTICAL, false));
+        mPxListView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
 
         service.searchPhotos("car", this);
     }
