@@ -18,13 +18,14 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import retrofit.Call;
 import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit.GsonConverterFactory;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 
-public class PxListActivity extends ActionBarActivity implements Callback<SearchResults> {
+public class PxListActivity extends ActionBarActivity {
     private static final int NUM_COLUMNS = 2;
 
     private RecyclerView mPxListView;
@@ -34,11 +35,11 @@ public class PxListActivity extends ActionBarActivity implements Callback<Search
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_px_list);
 
-        final RestAdapter restAdapter = new RestAdapter.Builder()
-                .setLogLevel(BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL: RestAdapter.LogLevel.NONE)
-                .setEndpoint(PxService.API_URL)
+        final Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(PxService.API_URL)
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        final PxService service = restAdapter.create(PxService.class);
+        final PxService service = retrofit.create(PxService.class);
 
         mPxListView = (RecyclerView) findViewById(R.id.px_list);
         mPxListView.setClickable(true);
@@ -47,18 +48,28 @@ public class PxListActivity extends ActionBarActivity implements Callback<Search
 //                GridLayoutManager.VERTICAL, false));
         mPxListView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
 
-        service.searchPhotos("car", this);
+        final Call<SearchResults> results = service.searchPhotos("car");
+        results.enqueue(new Callback<SearchResults>() {
+            @Override
+            public void onResponse(Response<SearchResults> response, Retrofit retrofit) {
+                if (response.isSuccess()) {
+                    success(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                failure(t.getMessage());
+            }
+        });
     }
 
-    @Override
-    public void success(SearchResults searchResults, Response response) {
-        mPxListView.setAdapter(new PxListAdapter(this, searchResults.photos));
+    public void success(SearchResults results) {
+        mPxListView.setAdapter(new PxListAdapter(this, results.photos));
     }
 
-    @Override
-    public void failure(RetrofitError error) {
-        Toast.makeText(this, "Failed to load photo list: " + error.getMessage(),
-                Toast.LENGTH_LONG).show();
+    public void failure(String error) {
+        Toast.makeText(this, "Failed to load photo list: " + error, Toast.LENGTH_LONG).show();
     }
 
     private static class PxListAdapter extends RecyclerView.Adapter<AppViewHolder> {
