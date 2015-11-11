@@ -2,7 +2,7 @@ package com.bidyut.app.fastpx;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
@@ -25,7 +25,7 @@ import retrofit.Response;
 import retrofit.Retrofit;
 
 
-public class PxListActivity extends ActionBarActivity {
+public class PxListActivity extends AppCompatActivity {
     private static final int NUM_COLUMNS = 2;
 
     private RecyclerView mPxListView;
@@ -46,7 +46,8 @@ public class PxListActivity extends ActionBarActivity {
         mPxListView.setHasFixedSize(true);
 //        mPxListView.setLayoutManager(new GridLayoutManager(this, NUM_COLUMNS,
 //                GridLayoutManager.VERTICAL, false));
-        mPxListView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        mPxListView.setLayoutManager(new StaggeredGridLayoutManager(2,
+                StaggeredGridLayoutManager.VERTICAL));
 
         final Call<SearchResults> results = service.searchPhotos("car");
         results.enqueue(new Callback<SearchResults>() {
