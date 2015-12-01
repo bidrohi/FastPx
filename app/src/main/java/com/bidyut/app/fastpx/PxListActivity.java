@@ -24,7 +24,6 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-
 public class PxListActivity extends AppCompatActivity {
     private static final int NUM_COLUMNS = 2;
 
@@ -97,9 +96,11 @@ public class PxListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(AppViewHolder holder, int position) {
-            mPicasso.load(mPhotos.get(position).image_url)
+            final PxPhoto pxPhoto = mPhotos.get(position);
+            mPicasso.load(pxPhoto.image_url)
 //                    .placeholder(R.drawable.placeholder)
                     .into(holder.image);
+            holder.image.setContentDescription(pxPhoto.description);
         }
     }
 
