@@ -3,8 +3,8 @@ package com.bidyut.app.fastpx;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +18,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import retrofit.Call;
-import retrofit.Callback;
 import retrofit.GsonConverterFactory;
-import retrofit.Response;
 import retrofit.Retrofit;
+import rx.functions.Action1;
 
 public class PxListActivity extends AppCompatActivity {
     private static final int NUM_COLUMNS = 2;
@@ -43,25 +41,23 @@ public class PxListActivity extends AppCompatActivity {
         mPxListView = (RecyclerView) findViewById(R.id.px_list);
         mPxListView.setClickable(true);
         mPxListView.setHasFixedSize(true);
-//        mPxListView.setLayoutManager(new GridLayoutManager(this, NUM_COLUMNS,
-//                GridLayoutManager.VERTICAL, false));
-        mPxListView.setLayoutManager(new StaggeredGridLayoutManager(2,
-                StaggeredGridLayoutManager.VERTICAL));
+        mPxListView.setLayoutManager(new GridLayoutManager(this, NUM_COLUMNS,
+                GridLayoutManager.VERTICAL, false));
+//        mPxListView.setLayoutManager(new StaggeredGridLayoutManager(2,
+//                StaggeredGridLayoutManager.VERTICAL));
 
-        final Call<SearchResults> results = service.searchPhotos("car");
-        results.enqueue(new Callback<SearchResults>() {
-            @Override
-            public void onResponse(Response<SearchResults> response, Retrofit retrofit) {
-                if (response.isSuccess()) {
-                    success(response.body());
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                failure(t.getMessage());
-            }
-        });
+        service.searchPhotos("car")
+                .subscribe(new Action1<SearchResults>() {
+                    @Override
+                    public void call(SearchResults searchResults) {
+                        success(searchResults);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        failure(throwable.getMessage());
+                    }
+                });
     }
 
     public void success(SearchResults results) {
