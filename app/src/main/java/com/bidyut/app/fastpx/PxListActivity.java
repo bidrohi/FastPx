@@ -18,27 +18,34 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
+import retrofit.RxJavaCallAdapterFactory;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 public class PxListActivity extends AppCompatActivity {
     private static final int NUM_COLUMNS = 2;
 
-    private RecyclerView mPxListView;
+    @Bind(R.id.px_list)
+    RecyclerView mPxListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_px_list);
+        ButterKnife.bind(this);
 
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(PxService.API_URL)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         final PxService service = retrofit.create(PxService.class);
 
-        mPxListView = (RecyclerView) findViewById(R.id.px_list);
         mPxListView.setClickable(true);
         mPxListView.setHasFixedSize(true);
         mPxListView.setLayoutManager(new GridLayoutManager(this, NUM_COLUMNS,
@@ -47,6 +54,8 @@ public class PxListActivity extends AppCompatActivity {
 //                StaggeredGridLayoutManager.VERTICAL));
 
         service.searchPhotos("car")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<SearchResults>() {
                     @Override
                     public void call(SearchResults searchResults) {
@@ -68,7 +77,7 @@ public class PxListActivity extends AppCompatActivity {
         Toast.makeText(this, "Failed to load photo list: " + error, Toast.LENGTH_LONG).show();
     }
 
-    private static class PxListAdapter extends RecyclerView.Adapter<AppViewHolder> {
+    private static class PxListAdapter extends RecyclerView.Adapter<PxViewHolder> {
         private final LayoutInflater mInflater;
         private final Picasso mPicasso;
         private final List<PxPhoto> mPhotos;
@@ -85,13 +94,13 @@ public class PxListActivity extends AppCompatActivity {
         }
 
         @Override
-        public AppViewHolder onCreateViewHolder(ViewGroup parent, int position) {
+        public PxViewHolder onCreateViewHolder(ViewGroup parent, int position) {
             final View view = mInflater.inflate(R.layout.px_frame, parent, false);
-            return new AppViewHolder(view);
+            return new PxViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(AppViewHolder holder, int position) {
+        public void onBindViewHolder(PxViewHolder holder, int position) {
             final PxPhoto pxPhoto = mPhotos.get(position);
             mPicasso.load(pxPhoto.image_url)
 //                    .placeholder(R.drawable.placeholder)
@@ -100,12 +109,13 @@ public class PxListActivity extends AppCompatActivity {
         }
     }
 
-    private static class AppViewHolder extends RecyclerView.ViewHolder {
-        public final ImageView image;
+    public static class PxViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.image)
+        public ImageView image;
 
-        public AppViewHolder(View view) {
+        public PxViewHolder(View view) {
             super(view);
-            this.image = (ImageView) view.findViewById(R.id.image);
+            ButterKnife.bind(this, view);
         }
     }
 }
