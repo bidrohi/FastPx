@@ -6,17 +6,15 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
-import com.bidyut.app.fastpx.service.PxService;
+import com.bidyut.app.fastpx.di.ApplicationComponent;
+import com.bidyut.app.fastpx.di.DaggerApplicationComponent;
+import com.bidyut.app.fastpx.di.PxServiceModule;
 import com.bidyut.app.fastpx.service.SearchResults;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
-import retrofit.RxJavaCallAdapterFactory;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 public class PxListActivity extends AppCompatActivity {
     private static final int NUM_COLUMNS = 2;
@@ -30,13 +28,6 @@ public class PxListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_px_list);
         ButterKnife.bind(this);
 
-        final Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(PxService.API_URL)
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        final PxService service = retrofit.create(PxService.class);
-
         mPxListView.setClickable(true);
         mPxListView.setHasFixedSize(true);
         mPxListView.setLayoutManager(new GridLayoutManager(this, NUM_COLUMNS,
@@ -44,8 +35,7 @@ public class PxListActivity extends AppCompatActivity {
 //        mPxListView.setLayoutManager(new StaggeredGridLayoutManager(2,
 //                StaggeredGridLayoutManager.VERTICAL));
 
-        service.searchPhotos("car")
-                .subscribeOn(Schedulers.io())
+        getComponent().repository().getItems("car")
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<SearchResults>() {
                     @Override
@@ -66,5 +56,11 @@ public class PxListActivity extends AppCompatActivity {
 
     public void failure(String error) {
         Toast.makeText(this, "Failed to load photo list: " + error, Toast.LENGTH_LONG).show();
+    }
+
+    private ApplicationComponent getComponent() {
+        return DaggerApplicationComponent.builder()
+                .pxServiceModule(new PxServiceModule(this))
+                .build();
     }
 }

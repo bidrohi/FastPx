@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bidyut.app.fastpx.service.PxPhoto;
+import com.bidyut.app.fastpx.data.PxPhoto;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -36,7 +36,7 @@ class PxListAdapter extends RecyclerView.Adapter<PxViewHolder> {
     @Override
     public void onBindViewHolder(PxViewHolder holder, int position) {
         final PxPhoto pxPhoto = mPhotos.get(position);
-        mPicasso.load(pxPhoto.image_url)
+        mPicasso.load(pxPhoto.imageUrl)
 //                    .placeholder(R.drawable.placeholder)
                 .into(holder.image);
         holder.image.setContentDescription(pxPhoto.description);

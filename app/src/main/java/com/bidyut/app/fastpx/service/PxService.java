@@ -2,8 +2,8 @@ package com.bidyut.app.fastpx.service;
 
 import com.bidyut.app.fastpx.BuildConfig;
 
-import retrofit.http.GET;
-import retrofit.http.Query;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
 import rx.Observable;
 
 public interface PxService {
