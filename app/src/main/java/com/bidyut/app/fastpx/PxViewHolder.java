@@ -4,11 +4,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class PxViewHolder extends RecyclerView.ViewHolder {
-    @Bind(R.id.image)
+    @BindView(R.id.image)
     public ImageView image;
 
     public PxViewHolder(View view) {

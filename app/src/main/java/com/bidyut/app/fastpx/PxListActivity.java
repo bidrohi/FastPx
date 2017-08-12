@@ -11,7 +11,7 @@ import com.bidyut.app.fastpx.di.DaggerApplicationComponent;
 import com.bidyut.app.fastpx.di.PxServiceModule;
 import com.bidyut.app.fastpx.service.SearchResults;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -19,7 +19,7 @@ import rx.functions.Action1;
 public class PxListActivity extends AppCompatActivity {
     private static final int NUM_COLUMNS = 2;
 
-    @Bind(R.id.px_list)
+    @BindView(R.id.px_list)
     RecyclerView mPxListView;
 
     @Override
